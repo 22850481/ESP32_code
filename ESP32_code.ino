@@ -13,8 +13,8 @@
 #define MOTOR_DRIVER_IN2_PIN 12           //Digital signal to motor driver "IN2" pin to signal forwards or backwards
 
 
-// Set your access point network credentials...replace with your own credentials
-const char* ssid = "********";              
+// Set your access point network credentials
+const char* ssid = "********";
 const char* password = "********";
 
 //setting PWM parameters
@@ -22,6 +22,9 @@ const char* password = "********";
 const int fifty_dutyCycle_for_Motor = 127;
 const int seventyfive_dutyCycle_for_Motor = 191;
 const int hundred_dutyCycle_for_Motor = 255;
+
+//variable to keep track of last position of servo
+int last_servo_position = 0;                    //0 is default position...1 is moved left...2 is moved right
 
  
 Servo FS90;          // Create a servo object
@@ -90,14 +93,61 @@ void loop() {
         
         //section to steer RC car left
         if ((command == int(1))||(command == int(49)))
-          FS90.write(40);
-        else if ((command == int(2))||(command == int(50)))
-          FS90.write(90);
-
+        {
+          if(last_servo_position == 0)
+          {
+            FS90.write(45);//turn motor counter-clockwise
+            delay(150);        // keep rotating for 0.15 seconds (150 milliseconds)
+            FS90.write(90);     //stop motor
+            last_servo_position = 2;
+          }
+          else if(last_servo_position == 1)
+          {
+            FS90.write(45);//turn motor counter-clockwise
+            delay(300);        // keep rotating for 0.3 seconds (300 milliseconds)
+            FS90.write(90);     //stop motor
+            last_servo_position = 2;
+          }
+        }
+          
+        else if ((command == int(2))||(command == int(50)))             // centre button pressed
+        {
+          if(last_servo_position == 1)
+          {
+            FS90.write(45);    //turn motor counter-clockwise
+            delay(150);        // keep rotating for 0.15 seconds (150 milliseconds)
+            FS90.write(90);     //stop motor
+            last_servo_position = 0;
+          }
+          else if(last_servo_position == 2)
+          {
+            FS90.write(135);    //turn motor clockwise
+            delay(150);        // keep rotating for 0.15 seconds (150 milliseconds)
+            FS90.write(90);     //stop motor
+            last_servo_position = 0;
+          }
+        }
 
          //section to steer RC car right
         if ((command == int(3))||(command == int(51)))
-          FS90.write(140);
+        {
+          if(last_servo_position == 0)
+          {
+            FS90.write(135);    //turn motor clockwise
+            delay(150);        // keep rotating for 0.15 seconds (150 milliseconds)
+            FS90.write(90);     //stop motor
+            last_servo_position = 1;
+          }
+          else if(last_servo_position == 2)
+          {
+            FS90.write(135);    //turn motor clockwise
+            delay(300);        // keep rotating for 0.3 seconds (300 milliseconds)
+            FS90.write(90);     //stop motor
+            last_servo_position = 1;
+          }
+          
+        }
+          
           
         
          //section to make RC car move backwards
